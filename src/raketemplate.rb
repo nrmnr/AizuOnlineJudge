@@ -3,22 +3,29 @@
 
 require "rake/clean"
 CLOBBER << "code.out"
-CLOBBER << "actual.txt"
+CLOBBER << FileList["actual*.txt"]
 
 rule ".out" => [".c"] do |t|
   sh "gcc #{t.source} -o #{t.name}"
 end
 
-file "actual.txt" => "code.out" do
-  if File.exist? "testcase.txt"
-    sh "./code.out < testcase.txt > actual.txt"
-  else
-    sh "./code.out > actual.txt"
-  end
-end
+Dir.glob("expected*.txt").each do |expected|
+  next unless expected =~ /expected(\d*)\.txt/
+  num = $1
+  actual = "actual#{num}.txt"
+  testcase = "testcase#{num}.txt"
 
-task :test => ["actual.txt", "expected.txt"] do
-  sh "diff actual.txt expected.txt"
+  file actual => "code.out" do
+    if File.exist? testcase
+      sh "./code.out < #{testcase} > #{actual}"
+    else
+      sh "./code.out > #{actual}"
+    end
+  end
+
+  task :test => [actual, expected] do
+    sh "diff #{actual} #{expected}"
+  end
 end
 
 task :default => :test
