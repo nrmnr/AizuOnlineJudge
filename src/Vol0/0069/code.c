@@ -7,8 +7,8 @@ int min(char a,char b){ return a<b?a:b; }
 void lot(){
   int mn,mx,tr,tm;
   for(tr=r,i=d;i-->0;){
-    for(j=1;j<n;++j)
-      if(b[i][j]&&(j==tr||j+1==tr)) tr=j+j+1-tr;
+    if(b[i][tr]) tr++;
+    else if(b[i][tr-1]) tr--;
   }
   if(tr==m){ printf("0\n"); return; }
   for(tm=m,i=0;i<d;++i){
@@ -16,11 +16,10 @@ void lot(){
     if(mx-mn==1 && !b[i][mn] && !b[i][mn-1] && !b[i][mx]){
       printf("%d %d\n",i+1,mn); return;
     }
-    for(j=1;j<n;++j)
-      if(b[i][j]){
-        if(j==tr||j+1==tr) tr=j+j+1-tr;
-        if(j==tm||j+1==tm) tm=j+j+1-tm;
-      }
+    if(b[i][tr]) tr++;
+    else if(b[i][tr-1]) tr--;
+    if(b[i][tm]) tm++;
+    else if(b[i][tm-1]) tm--;
   }
   printf("1\n");
 }
