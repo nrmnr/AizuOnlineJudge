@@ -1,26 +1,27 @@
+#include <stdio.h>
 #include <stdlib.h>
-char s[99],*p=s,h,f;double r[80];
-int d(c){return '0'<=c&&c<='9'||c=='.';}
-int b(c){return c==32||c==10||c==13;}
+#include <string.h>
 int main(){
-  int c;
-  for(;~(c=getchar());){
-    if(b(c)){
-      *p=0;p=s;
-      if(d(*s))
-        r[h++]=atof(s);
-      else{
-        h--;
-        if(*s=='+')r[h-1]+=r[h];
-        if(*s=='-')r[h-1]-=r[h];
-        if(*s=='*')r[h-1]*=r[h];
-        if(*s=='/')r[h-1]/=r[h];
-      }
-      if(c!=32)
-        printf("%lf\n",*r),h=f=0;
-    }else
-      *p++=c,f=1;
+  char token[99];
+  double stack[99];
+  int sp = 0;
+  for(;;){
+    if(scanf("%s",token)==-1) break;
+    if(strcmp(token, "+") == 0){
+      sp--; stack[sp-1] += stack[sp];
+    } else if(strcmp(token, "-") == 0){
+      sp--; stack[sp-1] -= stack[sp];
+    } else if(strcmp(token, "*") == 0){
+      sp--; stack[sp-1] *= stack[sp];
+    } else if(strcmp(token, "/") == 0){
+      sp--; stack[sp-1] /= stack[sp];
+    } else {
+      stack[sp++] = atof(token);
+    }
+    if(getchar() == '\n'){
+      printf("%f\n",stack[0]);
+      sp = 0;
+    }
   }
-  if(f)printf("%lf\n",*r);
   return 0;
 }
