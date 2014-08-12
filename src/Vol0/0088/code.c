@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct CODE {
+struct {
   char c;
   char code[9];
 } codes[] = {
@@ -15,7 +15,7 @@ struct CODE {
   { 'S', "00110"    }, { 'T', "00111"    }, { 'U', "10011100" }, { 'V', "10011101" },
   { 'W', "000010"   }, { 'X', "10010010" }, { 'Y', "10010011" }, { 'Z', "10010000" },
 };
-int CN = sizeof(codes) / sizeof(codes[0]);
+#define CN 32
 
 char *table = "ABCDEFGHIJKLMNOPQRSTUVWXYZ .,-'?";
 
@@ -24,7 +24,7 @@ char *find(char c){
   for(i = 0; i < CN; ++i){
     if(codes[i].c == c) return codes[i].code;
   }
-  return 0;
+  return NULL;
 }
 
 void output(char *code){
@@ -35,14 +35,12 @@ void output(char *code){
 int main()
 {
   char c, stack[99],*sp=stack;
-  int i,j,l;
+  int i,l;
   for(;;){
     c = getchar();
     if(c == EOF || c == '\n'){
       if((l = strlen(stack))>0){
-        for(;l<5;++l){
-          stack[l] = '0';
-        }
+        for(;l<5;++l) stack[l] = '0';
         stack[l] = '\0';
         output(stack);
       }
@@ -62,11 +60,8 @@ int main()
       output(tmpcode);
     }
     if(i > 0){
-      for(j=0;stack[i];++i,++j){
-        stack[j] = stack[i];
-      }
-      stack[j] = '\0';
-      sp = stack + j;
+      for(sp=stack; stack[i]; ++i,++sp) *sp = stack[i];
+      *sp = '\0';
     }
   }
   return 0;
