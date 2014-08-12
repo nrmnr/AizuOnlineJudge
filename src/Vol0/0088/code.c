@@ -38,17 +38,18 @@ int main()
   int i,j,l;
   for(;;){
     c = getchar();
-    if(c == EOF) break;
-    if(c == '\n'){
+    if(c == EOF || c == '\n'){
       if((l = strlen(stack))>0){
-        for(;l>=5;++l){
+        for(;l<5;++l){
           stack[l] = '0';
         }
         stack[l] = '\0';
         output(stack);
       }
+      if(c == EOF) break;
       puts("");
       sp = stack;
+      *sp = '\0';
       continue;
     }
     char *code = find(c);
