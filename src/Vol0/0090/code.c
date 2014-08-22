@@ -1,43 +1,59 @@
 #include <stdio.h>
 #include <math.h>
 
-char over[100][100];
 typedef struct {
   double x;
   double y;
 } Point;
-Point points[100];
+Point pts[100];
+Point cs_pts[9900];
+
+double sq(double x)
+{
+  return x * x;
+}
 
 double dist(const Point *p1, const Point *p2)
 {
-  double dx = p1->x - p2->x, dy = p1->y - p2->y;
-  return sqrt(dx*dx + dy*dy);
+  return sqrt(sq(p1->x - p2->x) + sq(p1->y - p2->y));
 }
+
 int main()
 {
-  int n,i,j;
-  for(;;){
-    scanf("%d", &n);
-    if(n == 0) break;
-
-    for(i=0; i<100; ++i)
-      for(j=0; j<100; ++j)
-        over[i][j] = (i==j)?1:0;
-
+  int n,i,j,cs_count,ans,count;
+  double d,theta,amp,x,y;
+  for(;scanf("%d", &n) && n;){
     for(i=0; i<n; ++i){
-      scanf("%lf,%lf", &points[i].x, &points[i].y);
-      for(j=0; j<i; ++j){
-        double d = dist(&points[i], &points[j]);
-        over[i][j] = over[j][i] = (d <=2.0)? 1 : 0;
+      scanf("%lf,%lf", &pts[i].x, &pts[i].y);
+    }
+
+    cs_count = 0;
+    for(i=0; i<n-1; ++i){
+      for(j=i+1; j<n; ++j){
+        d = dist(&pts[i], &pts[j]);
+        if(d > 2.0) continue;
+        theta = acos(d/2.0);
+        amp = atan2(pts[j].y - pts[i].y, pts[j].x - pts[i].x);
+        x = pts[i].x; y = pts[i].y;
+        cs_pts[cs_count].x = x + cos(theta + amp);
+        cs_pts[cs_count].y = y + sin(theta + amp);
+        cs_count++;
+        if(d == 0.0) continue;
+        cs_pts[cs_count].x = x + cos(theta - amp);
+        cs_pts[cs_count].y = y + sin(theta - amp);
+        cs_count++;
       }
     }
 
-    for(i=0; i<n; ++i){
+    ans = 1;
+    for(i=0; i<cs_count; ++i){
+      count = 0;
       for(j=0; j<n; ++j){
-        fprintf(stderr, " %d", over[i][j]);
+        if(dist(&cs_pts[i], &pts[j]) <= 1.0) count++;
       }
-      fprintf(stderr, "\n");
+      ans = (ans > count)? ans : count;
     }
+    printf("%d\n", ans);
   }
   return 0;
 }
