@@ -48,6 +48,8 @@ int enable_drop(int x, int y, int size)
 int solve(int remain_drop, int blur_amount)
 {
   if(remain_drop == 0) return (blur_amount == 0);
+  if(blur_amount < remain_drop * drop_size[1].blur) return 0;
+  if(blur_amount > remain_drop * drop_size[3].blur) return 0;
 
   int x,y,size;
   for(y=1; y<9; ++y){
