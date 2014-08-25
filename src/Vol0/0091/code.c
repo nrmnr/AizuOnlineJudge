@@ -48,7 +48,7 @@ int solve(int remain_drop, int blur_amount)
   if(remain_drop == 0) return (blur_amount == 0);
   if(0 < blur_amount && blur_amount < remain_drop * drop_size[1].blur) return 0;
 
-  int x,y,size,low,up,discount;
+  int x,y,size;
   for(y=1; y<9; ++y){
     for(x=1; x<9; ++x){
       if(cloth[y][x] <= 0) continue;
