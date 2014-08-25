@@ -58,15 +58,15 @@ int solve(int remain_drop, int blur_amount)
            y<drop_size[size].low || y>=drop_size[size].up) continue;
         if(!enable_drop(x, y, size)) continue;
         drop_ink(x, y, size, -1);
-        if(size == 3 && cloth[y-1][x] == 0 && cloth[y-2][x] > 0){
+        if(cloth[y][x] < cloth[y-1][x] || (y >= 2 && cloth[y-1][x] < cloth[y-2][x])){
           drop_ink(x, y, size, 1); // recover
           return 0;
         }
-        if(solve(remain_drop-1, blur_amount-drop_size[size].blur)){
+        if(!solve(remain_drop-1, blur_amount-drop_size[size].blur)){
+          drop_ink(x, y, size, 1); // recover
+        } else {
           printf("%d %d %d\n", x, y, size);
           return 1;
-        } else {
-          drop_ink(x, y, size, 1); // recover
         }
       }
     }
