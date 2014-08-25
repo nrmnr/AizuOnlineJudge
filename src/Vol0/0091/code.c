@@ -37,6 +37,8 @@ void drop_ink(int x, int y, int size, int delta)
 int enable_drop(int x, int y, int size)
 {
   int i;
+  if(x<drop_size[size].low || drop_size[size].up<=x ||
+     y<drop_size[size].low || drop_size[size].up<=y) return 0;
   for(i=0; i<drop_size[size].blur; ++i){
     if(cloth[y+drop_pts[i].dy][x+drop_pts[i].dx] <= 0) return 0;
   }
@@ -46,7 +48,6 @@ int enable_drop(int x, int y, int size)
 int solve(int remain_drop, int blur_amount)
 {
   if(remain_drop == 0) return (blur_amount == 0);
-  if(0 < blur_amount && blur_amount < remain_drop * drop_size[1].blur) return 0;
 
   int x,y,size;
   for(y=1; y<9; ++y){
@@ -54,8 +55,6 @@ int solve(int remain_drop, int blur_amount)
       if(cloth[y][x] <= 0) continue;
       for(size=3; size>=1; --size){
         if(blur_amount < drop_size[size].blur) continue;
-        if(x<drop_size[size].low || x>=drop_size[size].up ||
-           y<drop_size[size].low || y>=drop_size[size].up) continue;
         if(!enable_drop(x, y, size)) continue;
         drop_ink(x, y, size, -1);
         if(cloth[y][x] < cloth[y-1][x] || (y >= 2 && cloth[y-1][x] < cloth[y-2][x])){
