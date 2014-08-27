@@ -2,19 +2,6 @@
 
 long long memo[10][1001];
 
-void prt(int b, int e)
-{
-  int i,j;
-  for(j=b; j<e; ++j){
-    fprintf(stderr, " %3d:", j);
-    for(i=0; i<10; ++i){
-      fprintf(stderr, " %3lld", memo[i][j]);
-    }
-    fprintf(stderr, "\n");
-  }
-  fprintf(stderr, "--------------------------------\n");
-}
-
 int main()
 {
   int i,n,s;
@@ -26,9 +13,6 @@ int main()
       }
     }
   }
-  /* prt(0,20); */
-  /* prt(480,501); */
-  /* prt(860,880); */
   for(;scanf("%d%d",&n,&s) && (n||s);){
     printf("%lld\n", memo[n][s]);
   }
