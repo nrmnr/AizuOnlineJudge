@@ -29,18 +29,9 @@ void ins(int a, int v)
   int val;
   for(t=dp;t->next;t=t->next){
     val = t->next->val;
-    if(dp[a].val > val){
+    if(dp[a].val > val || (dp[a].val == val && a < t->next->num)){
       dp[a].next = t->next;
       t->next = &dp[a];
-      return;
-    } else if(dp[a].val == val){
-      if(a < t->next->num){
-        dp[a].next = t->next;
-        t->next = &dp[a];
-      } else {
-        dp[a].next = t->next->next;
-        t->next->next = &dp[a];
-      }
       return;
     }
   }
