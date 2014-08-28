@@ -44,7 +44,7 @@ int main()
   int n,q,a,v,i;
   for(i=0;i<N;++i) dp[i].num = i;
   scanf("%d%d",&n,&q);
-  for(i=0;i<q;++i){
+  for(0;q-->0;){
     scanf("%d%d",&a,&v);
     ins(a,v);
     printf("%d %d\n", dp->next->num, dp->next->val);
