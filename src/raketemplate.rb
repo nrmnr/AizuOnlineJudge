@@ -19,8 +19,16 @@ else
   $pre = "./"
 end
 
-rule $ext => [".c"] do |t|
-  sh "gcc #{t.source} -o #{t.name}"
+if File.exist? "code.cpp"
+  rule $ext => [".cpp"] do |t|
+    sh "g++ #{t.source} -o #{t.name}"
+  end
+elsif File.exist? "code.c"
+  rule $ext => [".c"] do |t|
+    sh "gcc #{t.source} -o #{t.name}"
+  end
+else
+  exit
 end
 
 Dir.glob("expected*.txt").each do |expected|
