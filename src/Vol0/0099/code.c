@@ -57,7 +57,7 @@ int main()
   int q,a,v;
   scanf("%d%d",&dt_n,&q);
   init();
-  for(0;q-->0;){
+  for(;q-->0;){
     scanf("%d%d",&a,&v);
     add(a-1,v);
     printf("%d %d\n", get_id()+1, st[0]);
