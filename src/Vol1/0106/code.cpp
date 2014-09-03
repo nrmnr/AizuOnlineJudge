@@ -3,7 +3,10 @@
 #include <vector>
 using namespace std;
 
-vector<int> price_memo(51, 1<<15);
+// #define DEBUG
+
+const int CEIL = 10000;
+vector<int> price_memo(51, CEIL);
 
 struct Unit {
   int gram;
@@ -20,8 +23,11 @@ const int unit_count = sizeof(units) / sizeof(units[0]);
 
 void prt()
 {
-  for (int i=0; i<23; ++i) {
-    if (price_memo[i] >= 1<<15)
+#ifndef DEBUG
+  return;
+#endif
+  for (int i=0; i<=50; ++i) {
+    if (price_memo[i] >= CEIL)
       cerr << setw(5) << "----";
     else
       cerr << setw(5) << price_memo[i];
@@ -37,7 +43,7 @@ void init()
     for (int j = 0; j+u.gram <= 50; j++) {
       price_memo[j+u.gram] = min(price_memo[j+u.gram], price_memo[j]+u.price);
     }
-    // prt();
+    prt();
   }
 }
 
