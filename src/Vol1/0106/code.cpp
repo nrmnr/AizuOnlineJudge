@@ -5,8 +5,10 @@ using namespace std;
 
 // #define DEBUG
 
+const int MAX_GRAM = 5000/100;
 const int CEIL = 10000;
-vector<int> price_memo(51, CEIL);
+
+vector<int> price_memo(MAX_GRAM+1, CEIL);
 
 struct Unit {
   int gram;
@@ -23,16 +25,15 @@ const int unit_count = sizeof(units) / sizeof(units[0]);
 
 void prt()
 {
-#ifndef DEBUG
-  return;
-#endif
-  for (int i=0; i<=50; ++i) {
-    if (price_memo[i] >= CEIL)
-      cerr << setw(5) << "----";
-    else
+#ifdef DEBUG
+  for (int i = 0; i <= MAX_GRAM; ++i) {
+    if (price_memo[i] < CEIL)
       cerr << setw(5) << price_memo[i];
+    else
+      cerr << setw(5) << "----";
   }
   cerr << endl;
+#endif
 }
 
 void init()
@@ -40,7 +41,7 @@ void init()
   price_memo[0] = 0;
   for (int i = 0; i < unit_count; ++i) {
     Unit u = units[i];
-    for (int j = 0; j+u.gram <= 50; j++) {
+    for (int j = 0; j+u.gram <= MAX_GRAM; j++) {
       price_memo[j+u.gram] = min(price_memo[j+u.gram], price_memo[j]+u.price);
     }
     prt();
