@@ -5,7 +5,7 @@ using namespace std;
 
 struct Point
 {
-  int pos[3];
+  double pos[3];
 
   string to_s() const
   {
@@ -48,7 +48,11 @@ struct Triangle
 Point load_point()
 {
   Point p;
-  for (int i = 0; i < 3; ++i) cin >> p.pos[i];
+  for (int i = 0; i < 3; ++i) {
+    int n;
+    cin >> n;
+    p.pos[i] = n;
+  }
   return p;
 }
 
