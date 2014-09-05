@@ -45,27 +45,27 @@ struct Triangle
   }
 };
 
-Point get_point()
+Point load_point()
 {
   Point p;
   for (int i = 0; i < 3; ++i) cin >> p.pos[i];
   return p;
 }
 
-Triangle get_triangle()
+Triangle load_triangle()
 {
   Triangle tri;
   for (int i = 0; i < 3; ++i) {
-    tri.points[i] = get_point();
+    tri.points[i] = load_point();
   }
   return tri;
 }
 
 int main()
 {
-  Point uaz = get_point();
-  Point enemy = get_point();
-  Triangle barrier = get_triangle();
+  Point uaz = load_point();
+  Point enemy = load_point();
+  Triangle barrier = load_triangle();
   Point beam = enemy - uaz;
   barrier.rebase(uaz);
   cout << (barrier.hit(beam)? "MISS":"HIT") << endl;
