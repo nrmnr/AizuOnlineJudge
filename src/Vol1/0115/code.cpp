@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-#include <strstream>
+#include <sstream>
 using namespace std;
 
 struct Point
@@ -9,7 +9,7 @@ struct Point
 
   string to_s() const
   {
-    strstream out;
+    ostringstream out;
     out << "(" << pos[0] << ", " << pos[1] << ", " << pos[2] << ")";
     return out.str();
   }
@@ -28,7 +28,7 @@ struct Triangle
 
   string to_s() const
   {
-    strstream out;
+    ostringstream out;
     out << points[0].to_s() << " - " << points[1].to_s() << " - " << points[2].to_s();
     return out.str();
   }
