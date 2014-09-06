@@ -1,7 +1,11 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <iomanip>
+#include <cmath>
 using namespace std;
+
+// #define DEBUG
 
 struct Point
 {
@@ -38,43 +42,73 @@ struct Triangle
     for (int i = 0; i < 3; ++i) this->points[i] = this->points[i] - base;
   }
 
+  void show(double m[3][4])
+  {
+#ifdef DEBUG
+    for (int i = 0; i < 3; ++i) {
+      for (int j = 0; j < 4; ++j) {
+        cerr << setw(5) << m[i][j];
+      }
+      cerr << endl;
+    }
+    cerr << "------------" << endl;
+#endif
+  }
+
+  /** ガウスの掃き出し法による解法
+   * @param m 方程式の係数行列 末尾成分は方程式の右辺
+   */
+  void gauss(double m[3][4])
+  {
+    show(m);
+    int pivot; // 係数を1にしたい対角成分
+    for (pivot = 0; pivot < 3; ++pivot) {
+      // 誤差を少なくするため，pivot列成分の絶対値が大きな行を選択
+      double max_p = 0;
+      int swap = pivot;
+      for (int i = pivot; i < 3; ++i) { // 既に処理した行が対象外
+        if (fabs(m[i][pivot]) > max_p) {
+          max_p = fabs(m[i][pivot]);
+          swap = i;
+        }
+      }
+      // 見つけた行をpivot行目にもってくる
+      if (pivot != swap) {
+        for (int j = 0; j < 4; ++j) {
+          double t = m[pivot][j]; m[pivot][j] = m[swap][j]; m[swap][j] = t;
+        }
+      }
+      // pivot行pivot列の成分を1にする(行全体に同じ係数を掛ける)
+      double fact = m[pivot][pivot];
+      for (int j = 0; j < 4; ++j) {
+        m[pivot][j] /= fact;
+      }
+      // pivot行以外の行については，pivot列が0となるよう，
+      // 係数を掛け，pivot行と足し合わせる
+      for (int i = 0; i < 3; ++i) {
+        if (i == pivot) continue;
+        double fact = - m[i][pivot] / m[pivot][pivot];
+        for (int j = 0; j < 4; ++j) {
+          m[i][j] += m[pivot][j] * fact;
+        }
+      }
+      show(m);
+    }
+  }
+
   bool hit(const Point& target)
   {
     int i, j;
-    double m[3][3], a[3];
+    double m[3][4];
     for (i = 0; i < 3; ++i) {
-      a[i] = target.pos[i];
-      for (j = 0; j < 3; ++j)
-        m[i][j] = points[j].pos[i];
-    }
-    double det
-      = m[0][0]*m[1][1]*m[2][2] + m[1][0]*m[2][1]*m[0][2] + m[2][0]*m[0][1]*m[1][2]
-      - m[0][0]*m[2][1]*m[1][2] - m[2][0]*m[1][1]*m[0][2] - m[1][0]*m[0][1]*m[2][2];
-
-    double md[3][3];
-    md[0][0] = m[1][1]*m[2][2] - m[1][2]*m[2][1];
-    md[0][1] = m[0][2]*m[2][1] - m[0][1]*m[2][2];
-    md[0][2] = m[0][1]*m[1][2] - m[0][2]*m[1][1];
-
-    md[1][0] = m[1][2]*m[2][0] - m[1][0]*m[2][2];
-    md[1][1] = m[0][0]*m[2][2] - m[0][2]*m[2][0];
-    md[1][2] = m[0][2]*m[1][0] - m[0][0]*m[1][2];
-
-    md[2][0] = m[1][0]*m[2][1] - m[1][1]*m[2][0];
-    md[2][1] = m[0][1]*m[2][0] - m[0][0]*m[2][1];
-    md[2][2] = m[0][0]*m[1][1] - m[0][1]*m[1][0];
-
-    for (i = 0; i < 3; ++i) for (j = 0; j < 3; ++j) md[i][j] /= det;
-    double stu[3];
-    for (i = 0; i < 3; ++i) {
-      stu[i] = 0;
       for (j = 0; j < 3; ++j) {
-        stu[i] += md[i][j] * a[j];
+        m[i][j] = points[j].pos[i];
       }
+      m[i][j] = target.pos[i];
     }
-
-    if (stu[0] <= 0 || stu[1] <= 0 || stu[2] <= 0) return false;
-    if (stu[0] + stu[1] + stu[2] < 1.0) return false;
+    gauss(m);
+    if (m[0][3] <= 0 || m[1][3] <= 0 || m[2][3] <= 0) return false;
+    if (m[0][3] + m[1][3] + m[2][3] < 1.0) return false;
     return true;
   }
 };
