@@ -5,10 +5,15 @@
 #include <cmath>
 using namespace std;
 
-// #define DEBUG
+#define DEBUG
 
 struct Point
 {
+  Point()
+  {
+    for (int i = 0; i < 3; ++i) pos[i] = 0;
+  }
+
   double pos[3];
 
   string to_s() const
@@ -23,6 +28,23 @@ struct Point
     Point ret;
     for (int i = 0; i < 3; ++i) ret.pos[i] = this->pos[i] - dr.pos[i];
     return ret;
+  }
+
+  bool operator == (const Point& dr) const
+  {
+    for (int i = 0; i < 3; ++i) {
+      if (pos[i] != dr.pos[i]) return false;
+    }
+    return true;
+  }
+
+  double dist(const Point& dr) const
+  {
+    double d = 0;
+    for (int i = 0; i < 3; ++i) {
+      d += (dr.pos[i] - pos[i]) * (dr.pos[i] - pos[i]);
+    }
+    return sqrt(d);
   }
 };
 
@@ -57,8 +79,9 @@ struct Triangle
 
   /** ガウスの掃き出し法による解法
    * @param m 方程式の係数行列 末尾成分は方程式の右辺
+   * @return true:解あり，false:それ以外
    */
-  void gauss(double m[3][4])
+  bool gauss(double m[3][4])
   {
     show(m);
     int pivot; // 係数を1にしたい対角成分
@@ -80,6 +103,7 @@ struct Triangle
       }
       // pivot行pivot列の成分を1にする(行全体に同じ係数を掛ける)
       double fact = m[pivot][pivot];
+      if (fact == 0) return false; // 不定
       for (int j = 0; j < 4; ++j) {
         m[pivot][j] /= fact;
       }
@@ -94,9 +118,29 @@ struct Triangle
       }
       show(m);
     }
+    return true;
   }
 
-  bool hit(const Point& target)
+  // 線分上にtargetが乗っているか判定
+  bool on_edge(const Point& p1, const Point& p2, const Point& target)
+  {
+    if (p1 == target || p2 == target) return true;
+    Point a = target - p1, b = p2 - p1;
+    double da = a.dist(Point()), db = b.dist(Point());
+    for (int i = 0; i < 3; ++i) {
+      if (a.pos[i] / da != b.pos[i] / db) return false;
+    }
+    return true;
+  }
+
+  bool on_edge(const Point& target)
+  {
+    return (on_edge(points[0], points[1], target) ||
+            on_edge(points[1], points[2], target) ||
+            on_edge(points[2], points[0], target));
+  }
+
+  bool barriered(const Point& target)
   {
     int i, j;
     double m[3][4];
@@ -106,10 +150,13 @@ struct Triangle
       }
       m[i][j] = target.pos[i];
     }
-    gauss(m);
-    if (m[0][3] <= 0 || m[1][3] <= 0 || m[2][3] <= 0) return false;
-    if (m[0][3] + m[1][3] + m[2][3] < 1.0) return false;
-    return true;
+    if (gauss(m)) {
+      if (m[0][3] < 0 || m[1][3] < 0 || m[2][3] < 0) return false;
+      if (m[0][3] + m[1][3] + m[2][3] < 1.0) return false;
+      return true;
+    } else {
+      return on_edge(target);
+    }
   }
 };
 
@@ -140,6 +187,6 @@ int main()
   Triangle barrier = load_triangle();
   Point beam = enemy - uaz;
   barrier.rebase(uaz);
-  cout << (barrier.hit(beam)? "MISS":"HIT") << endl;
+  cout << (barrier.barriered(beam)? "MISS":"HIT") << endl;
   return 0;
 }
