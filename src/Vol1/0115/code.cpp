@@ -5,11 +5,11 @@
 #include <cmath>
 using namespace std;
 
-#define DEBUG
+// #define DEBUG
 
-struct Point
+struct Vect
 {
-  Point()
+  Vect()
   {
     for (int i = 0; i < 3; ++i) pos[i] = 0;
   }
@@ -23,14 +23,14 @@ struct Point
     return out.str();
   }
 
-  const Point operator - (const Point& dr) const
+  const Vect operator - (const Vect& dr) const
   {
-    Point ret;
+    Vect ret;
     for (int i = 0; i < 3; ++i) ret.pos[i] = this->pos[i] - dr.pos[i];
     return ret;
   }
 
-  bool operator == (const Point& dr) const
+  bool operator == (const Vect& dr) const
   {
     for (int i = 0; i < 3; ++i) {
       if (pos[i] != dr.pos[i]) return false;
@@ -38,7 +38,7 @@ struct Point
     return true;
   }
 
-  double dist(const Point& dr) const
+  double dist(const Vect& dr) const
   {
     double d = 0;
     for (int i = 0; i < 3; ++i) {
@@ -50,7 +50,7 @@ struct Point
 
 struct Triangle
 {
-  Point points[3];
+  Vect points[3];
 
   string to_s() const
   {
@@ -59,7 +59,7 @@ struct Triangle
     return out.str();
   }
 
-  void rebase(const Point& base)
+  void rebase(const Vect& base)
   {
     for (int i = 0; i < 3; ++i) this->points[i] = this->points[i] - base;
   }
@@ -122,25 +122,25 @@ struct Triangle
   }
 
   // 線分上にtargetが乗っているか判定
-  bool on_edge(const Point& p1, const Point& p2, const Point& target)
+  bool on_edge(const Vect& p1, const Vect& p2, const Vect& target)
   {
     if (p1 == target || p2 == target) return true;
-    Point a = target - p1, b = p2 - p1;
-    double da = a.dist(Point()), db = b.dist(Point());
+    Vect a = target - p1, b = p2 - p1;
+    double da = a.dist(Vect()), db = b.dist(Vect());
     for (int i = 0; i < 3; ++i) {
       if (a.pos[i] / da != b.pos[i] / db) return false;
     }
     return true;
   }
 
-  bool on_edge(const Point& target)
+  bool on_edge(const Vect& target)
   {
     return (on_edge(points[0], points[1], target) ||
             on_edge(points[1], points[2], target) ||
             on_edge(points[2], points[0], target));
   }
 
-  bool barriered(const Point& target)
+  bool barriered(const Vect& target)
   {
     int i, j;
     double m[3][4];
@@ -160,9 +160,9 @@ struct Triangle
   }
 };
 
-Point load_point()
+Vect load_point()
 {
-  Point p;
+  Vect p;
   for (int i = 0; i < 3; ++i) {
     int n;
     cin >> n;
@@ -182,10 +182,10 @@ Triangle load_triangle()
 
 int main()
 {
-  Point uaz = load_point();
-  Point enemy = load_point();
+  Vect uaz = load_point();
+  Vect enemy = load_point();
   Triangle barrier = load_triangle();
-  Point beam = enemy - uaz;
+  Vect beam = enemy - uaz;
   barrier.rebase(uaz);
   cout << (barrier.barriered(beam)? "MISS":"HIT") << endl;
   return 0;
