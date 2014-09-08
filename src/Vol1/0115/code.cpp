@@ -1,11 +1,14 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
 #include <iomanip>
 #include <cmath>
 using namespace std;
 
 // #define DEBUG
+
+typedef vector<vector<double> > Matrix;
 
 struct Vect
 {
@@ -64,11 +67,12 @@ struct Triangle
     for (int i = 0; i < 3; ++i) this->points[i] = this->points[i] - base;
   }
 
-  void show(double m[3][4])
+  void show(Matrix& m)
   {
 #ifdef DEBUG
-    for (int i = 0; i < 3; ++i) {
-      for (int j = 0; j < 4; ++j) {
+    int var_count = m.size();
+    for (int i = 0; i < var_count; ++i) {
+      for (int j = 0; j < var_count+1; ++j) {
         cerr << setw(5) << m[i][j];
       }
       cerr << endl;
@@ -81,15 +85,16 @@ struct Triangle
    * @param m 方程式の係数行列 末尾成分は方程式の右辺
    * @return true:解あり，false:それ以外
    */
-  bool gauss(double m[3][4])
+  bool gauss(Matrix& m)
   {
     show(m);
+    int var_count = m.size();
     int pivot; // 係数を1にしたい対角成分
-    for (pivot = 0; pivot < 3; ++pivot) {
+    for (pivot = 0; pivot < var_count; ++pivot) {
       // 誤差を少なくするため，pivot列成分の絶対値が大きな行を選択
       double max_p = 0;
       int swap = pivot;
-      for (int i = pivot; i < 3; ++i) { // 既に処理した行が対象外
+      for (int i = pivot; i < var_count; ++i) { // 既に処理した行が対象外
         if (fabs(m[i][pivot]) > max_p) {
           max_p = fabs(m[i][pivot]);
           swap = i;
@@ -97,22 +102,22 @@ struct Triangle
       }
       // 見つけた行をpivot行目にもってくる
       if (pivot != swap) {
-        for (int j = 0; j < 4; ++j) {
+        for (int j = 0; j < var_count+1; ++j) {
           double t = m[pivot][j]; m[pivot][j] = m[swap][j]; m[swap][j] = t;
         }
       }
       // pivot行pivot列の成分を1にする(行全体に同じ係数を掛ける)
       double fact = m[pivot][pivot];
       if (fact == 0) return false; // 不定
-      for (int j = 0; j < 4; ++j) {
+      for (int j = 0; j < var_count+1; ++j) {
         m[pivot][j] /= fact;
       }
       // pivot行以外の行については，pivot列が0となるよう，
       // 係数を掛け，pivot行と足し合わせる
-      for (int i = 0; i < 3; ++i) {
+      for (int i = 0; i < var_count; ++i) {
         if (i == pivot) continue;
         double fact = - m[i][pivot] / m[pivot][pivot];
-        for (int j = 0; j < 4; ++j) {
+        for (int j = 0; j < var_count+1; ++j) {
           m[i][j] += m[pivot][j] * fact;
         }
       }
@@ -143,12 +148,13 @@ struct Triangle
   bool barriered(const Vect& target)
   {
     int i, j;
-    double m[3][4];
+    Matrix m;
     for (i = 0; i < 3; ++i) {
+      m.push_back(vector<double>());
       for (j = 0; j < 3; ++j) {
-        m[i][j] = points[j].pos[i];
+        m[i].push_back(points[j].pos[i]);
       }
-      m[i][j] = target.pos[i];
+      m[i].push_back(target.pos[i]);
     }
     if (gauss(m)) {
       if (m[0][3] < 0 || m[1][3] < 0 || m[2][3] < 0) return false;
