@@ -6,7 +6,7 @@
 #include <cmath>
 using namespace std;
 
-#define DEBUG
+// #define DEBUG
 
 typedef vector<vector<double> > Matrix;
 
@@ -194,7 +194,9 @@ int main()
   Vect enemy = load_point();
   Triangle barrier = load_triangle();
   Vect beam = enemy - uaz;
-  Triangle shift_barrier = barrier - uaz;
-  cout << (shift_barrier.barriered(beam)? "MISS":"HIT") << endl;
+  Vect inv_beam = uaz - enemy;
+  Triangle b1 = barrier - uaz;
+  Triangle b2 = barrier - enemy;
+  cout << ((b1.barriered(beam) || b2.barriered(inv_beam))? "MISS":"HIT") << endl;
   return 0;
 }
