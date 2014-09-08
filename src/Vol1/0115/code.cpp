@@ -6,7 +6,7 @@
 #include <cmath>
 using namespace std;
 
-// #define DEBUG
+#define DEBUG
 
 typedef vector<vector<double> > Matrix;
 
@@ -62,9 +62,11 @@ struct Triangle
     return out.str();
   }
 
-  void rebase(const Vect& base)
+  const Triangle operator - (const Vect& base)
   {
-    for (int i = 0; i < 3; ++i) this->points[i] = this->points[i] - base;
+    Triangle t(*this);
+    for (int i = 0; i < 3; ++i) t.points[i] = t.points[i] - base;
+    return t;
   }
 
   void show(Matrix& m)
@@ -192,7 +194,7 @@ int main()
   Vect enemy = load_point();
   Triangle barrier = load_triangle();
   Vect beam = enemy - uaz;
-  barrier.rebase(uaz);
-  cout << (barrier.barriered(beam)? "MISS":"HIT") << endl;
+  Triangle shift_barrier = barrier - uaz;
+  cout << (shift_barrier.barriered(beam)? "MISS":"HIT") << endl;
   return 0;
 }
