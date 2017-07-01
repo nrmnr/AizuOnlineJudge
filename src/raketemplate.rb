@@ -46,7 +46,7 @@ Dir.glob("expected*.txt").each do |expected|
   end
 
   task :test => [actual, expected] do
-    sh "diff #{actual} #{expected}"
+    sh "diff #{actual} #{expected}" rescue nil
   end
 end
 
