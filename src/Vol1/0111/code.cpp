@@ -1,6 +1,5 @@
 #include <iostream>
 #include <string>
-#include <string.h>
 #include <vector>
 #include <algorithm>
 #include <iterator>
@@ -46,9 +45,11 @@ Dict dict_src[] = {
 };
 const int DICT_SZ = sizeof(dict_src) / sizeof(dict_src[0]);
 vector<Dict> dict(DICT_SZ);
+Dict TERM = {'\0', ""};
 
 bool comp(const Dict& d1, const Dict& d2)
 {
+  if (d1.bits.size() != d2.bits.size()) return d1.bits.size() < d2.bits.size();
   return d1.bits < d2.bits;
 }
 
@@ -65,7 +66,7 @@ Dict search(const string& bits, int pos)
       return *it;
     }
   }
-  return dict[0];
+  return TERM;
 }
 
 string to_bit(char c)
@@ -100,20 +101,23 @@ int main()
 {
   init_dict();
   string input;
-  cin >> input;
-  string bits;
-  bits.reserve(200*5);
-  for (string::iterator it = input.begin(); it != input.end(); ++it) {
-    bits += to_bit(*it);
-  }
+  for (;getline(cin, input);) {
+    string bits;
+    bits.reserve(200*5);
+    for (string::iterator it = input.begin(); it != input.end(); ++it) {
+      bits += to_bit(*it);
+    }
 
-  string ans;
-  for (string::const_iterator pos = bits.begin(); pos < bits.end(); ) {
-    Dict d = search(pos);
-    ans += d.c;
-    advance(pos, ans.bits.size());
-  }
+    string ans;
+    for (int pos = 0, l = bits.size(); pos < l; ) {
+      Dict d = search(bits, pos);
+      if (d.c == '\0') break;
+      ans += d.c;
+      pos += d.bits.size();
+    }
 
-  cout << ans << endl;
+    cout << ans << endl;
+  }
+  cin.clear();
   return 0;
 }
